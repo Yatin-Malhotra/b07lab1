@@ -46,9 +46,6 @@ public class Polynomial {
 	}
 	
 	public boolean hasRoot(double val) {
-		if (evaluate(val) == 0) {
-			return true;
-		}
-		return false;
+		return evaluate(val) == 0);
 	}
 }
