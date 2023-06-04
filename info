@@ -1,2 +1,3 @@
 This file acts similar to the README file, i.e., this would contain some information about the First Lab
-We have a polynomial file which can do certain tasks such 
+We have a polynomial file which can do certain tasks such as add, evaluate the polynomial at a certain value, and check if something is a root of the polynomial.
+The driver file is just tester file where the code is run
