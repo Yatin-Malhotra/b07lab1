@@ -4,14 +4,14 @@ import java.io.*;
 public class Polynomial {
 	
 	double coefficients[];
-	double exponents[];
+	int exponents[];
 	
 	public Polynomial() {
 		coefficients = null;
 		exponents = null;
 	}
 	
-	public Polynomial(double given_coefficients[], double given_exponents[]) {
+	public Polynomial(double given_coefficients[], int given_exponents[]) {
 		coefficients = given_coefficients;
 		exponents = given_exponents;
 	}
@@ -67,10 +67,12 @@ public class Polynomial {
 		// 	The length will be the lengthOurPoly + lengthOtherPoly - common
 		int length_final = this.coefficients.length + otherPoly.coefficients.length - counter;
 
-		int new_exponents = new int [length_final];
+		int new_exponents[] = new int[length_final];
 		for (int i = 0; i < length_final; i++) {
 			new_exponents[i] = -1000;
 		}
+		
+		double new_coeff[] = new double[length_final];
 
 			
 		// Add the exponent into this array
@@ -98,7 +100,7 @@ public class Polynomial {
 		for (int i = 0; i < length_final; i++) {
 			for (int j = 0; j < length_final; j++) {
 				int temp = 0;
-				if (new_exponents[i] > new_exponents[j]) {
+				if (new_exponents[i] < new_exponents[j]) {
 					temp = new_exponents[i];
 					new_exponents[i] = new_exponents[j];
 					new_exponents[j] = temp;
@@ -109,8 +111,8 @@ public class Polynomial {
 
 		// Loop through the new_exponents array, and for each element, find the index of that in this.exponents and otherPoly.exponents. Add the coefficients for both and set that to the index of new_coeff
 		for (int i = 0; i < length_final; i++) {
-			int index_our_poly = find_index(new_exponents[i], this.coefficients.length, this.coefficients);
-			int index_other_poly = find_index(new_exponents[i], otherPoly.coefficients.length, otherPoly.coefficients);
+			int index_our_poly = find_index(new_exponents[i], this.coefficients.length, this.exponents);
+			int index_other_poly = find_index(new_exponents[i], otherPoly.coefficients.length, otherPoly.exponents);
 			if (index_our_poly == -1) {
 				new_coeff[i] = otherPoly.coefficients[index_other_poly];
 			} else if (index_other_poly == -1) {
@@ -160,30 +162,25 @@ public class Polynomial {
 		return evaluate(val) == 0;
 	}
 	
-	public Polynomial multiply(Polynomial otherPoly) {
-		int ourPolyLen = coefficients.length;
-		int otherPolyLen = otherPoly.coefficients.length;
+	public Polynomial multiply(Polynomial otherPoly) {		
+		double new_coeff[] = new double[0];
+		int new_exponents[] = new int[0];
+		Polynomial new_poly = new Polynomial(new_coeff, new_exponents);
 		
-		int lengthFinal = ourPolyLen + otherPolyLen - 1;
-		
-		double new_coeff[] = new double[lengthFinal];
-		int new_exponents[] = new int[lengthFinal];
-		
-		for (int i = 0; i < lengthFinal; i++) {
-			new_coeff[i] = 0;
-			new_exponents[i] = 0;
-		}
-		
-		for (int i = 0; i < ourPolyLen; i++) {
-			for (int j = 0; j < otherPolyLen; j++) {
-				new_coeff[i + j] += coefficients[i] * otherPoly.coefficients[j];
-				exponents[i + j] = exponents[i] + otherPoly.exponents[j];
+		for (int i = 0; i < this.coefficients.length; i++) {
+			double part_coeff[] = new double[this.coefficients.length];
+			int part_expon[] = new int[this.exponents.length];
+			for (int j = 0; j < otherPoly.coefficients.length; j++) {
+				part_coeff[j] = this.coefficients[i] * otherPoly.coefficients[j];
+				part_expon[j] = this.exponents[i] + otherPoly.exponents[j];
 			}
+			Polynomial inner_poly = new Polynomial(part_coeff, part_expon);
+			new_poly = new_poly.add(inner_poly);
 		}
 		
-		Polynomial p = new Polynomial(new_coeff, new_exponents);
-		return p;
+		return new_poly;
 	}
+	
 	
 	public void saveToFile(String file) throws Exception {
 		
@@ -202,14 +199,14 @@ public class Polynomial {
 		String writeString = "";
 		
 		for (int i = 0; i < this.coefficients.length; i++) {
-			writeString += String(coefficients[i]);
+			writeString += coefficients[i];
 			if (this.exponents[i] != 0) {
 				writeString += "x" + this.exponents[i];
 			}
 			writeString += "+";
 		}
 		
-		if writeString.endsWith("+") {
+		if (writeString.endsWith("+")) {
 			writeString = writeString.substring(0, writeString.length() - 1);
 		}
 		
@@ -217,4 +214,5 @@ public class Polynomial {
 		myWriter.write(writeString);
 		myWriter.close();
 	}
+	
 }
